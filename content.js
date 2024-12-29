@@ -61,8 +61,16 @@ let chatHistory = [];
 })();
 
 function init() {
+    cleanup();
     appendAIButton();
     loadAiKey();
+}
+
+//removes perviosuly open elements
+function cleanup(){
+    if(document.getElementById('chat_ui_contanier')){
+        document.getElementById('chat_ui_contanier').remove();
+    }
 }
 
 // insert a new button just befre the ask doubt button, in the same style
@@ -134,6 +142,17 @@ function loadAiKey() {
     });
 }
 
+function loadHistory() {
+    let key = currentProblem.id.toString();
+    chrome.storage.sync.get(key, function (result) {
+        if(result != null){
+            chatHistory = result[key];
+            chatHistory.forEach(chat => {
+                updateChatUi(chat, false);
+            });
+        }
+    });
+}
 
 function askApiKey() {
     // Create overlay
@@ -196,7 +215,7 @@ function askApiKey() {
             return;
         }
         aiKey = input.value;
-        chrome.storage.sync.set({ aiKey: aiKey });
+        chrome.storage.sync.set({ 'aiKey': aiKey });
         document.body.removeChild(popupOverlay);
         document.getElementById('ai_button').click();
     });
@@ -301,6 +320,9 @@ function addChatUi() {
     inputRow.appendChild(sendButton);
     chatUiContainer.appendChild(inputRow);
     btn.parentNode.insertAdjacentElement('afterend', chatUiContainer);
+
+    // populate chat history
+    loadHistory();
 }
 
 // send msg
@@ -318,9 +340,12 @@ function sendMsg() {
     chatHistory.push(msgStruct);
     updateChatUi(msgStruct);
     getAiResponse(msg);
+    let key = currentProblem.id.toString();
+    chrome.storage.sync.set({ [key] : chatHistory});
 }
 
-function updateChatUi(msgStruct) {
+function updateChatUi(msgStruct, buildThinking = true) {
+
     if (msgStruct.type == "model" && document.getElementById('ai_processing')) {
         document.getElementById('ai_processing').remove();
         var converter = new showdown.Converter();
@@ -359,9 +384,8 @@ function updateChatUi(msgStruct) {
     }
 
     //show processing if the message is from the user
-    if (msgStruct.type === 'user') {
+    if (msgStruct.type === 'user' && buildThinking) {
         const processingMsg = { type: 'ai', msg: 'Thinking...' };
-        chatHistory.push(processingMsg);
         updateChatUi(processingMsg);
     }
 }
@@ -442,8 +466,16 @@ function getAiResponse(msg) {
             const aiResponse = { type: 'model', msg: extractedText };
             chatHistory.push(aiResponse);
             updateChatUi(aiResponse);
+            
+            let key = currentProblem.id.toString();
+            chrome.storage.sync.set({ [key]: chatHistory}); 
         })
         .catch(error => {
             console.error('Error:', error);
+            const aiResponse = { type: 'model', msg: error.message };
+            chatHistory.push(aiResponse);
+            updateChatUi(aiResponse);
+            let key = currentProblem.id.toString();
+            chrome.storage.sync.set({ [key]: chatHistory}); 
         });
 }
