@@ -196,6 +196,7 @@ function askApiKey() {
             return;
         }
         aiKey = input.value;
+        chrome.storage.sync.set({ aiKey: aiKey });
         document.body.removeChild(popupOverlay);
         document.getElementById('ai_button').click();
     });
