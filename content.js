@@ -322,6 +322,9 @@ function sendMsg() {
 function updateChatUi(msgStruct) {
     if (msgStruct.type == "model" && document.getElementById('ai_processing')) {
         document.getElementById('ai_processing').remove();
+        var converter = new showdown.Converter();
+        msgStruct.msg = converter.makeHtml(msgStruct.msg);
+
     }
     const chatUi = document.getElementById('chat_ui');
     const msgDiv = document.createElement('div');
@@ -337,6 +340,9 @@ function updateChatUi(msgStruct) {
     msgDiv.style.maxWidth = '80%';
     msgDiv.style.overflowWrap = 'break-word';
     msgDiv.textContent = msgStruct.msg;
+    if(msgStruct.type === 'model'){
+        msgDiv.innerHTML = msgStruct.msg;
+    }
     msgDiv.display = 'inline-block';
     if (msgStruct.msg === 'Thinking...') {
         msgDiv.id = 'ai_processing';
