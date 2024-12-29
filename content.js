@@ -294,6 +294,7 @@ function addChatUi() {
     chatUiContainer.id = 'chat_ui_contanier';
     chatUiContainer.style.height = '500px';
     chatUiContainer.style.width = '100%';
+    chatUiContainer.style.position = 'relative';
 
 
     const div = document.createElement('div');
@@ -344,9 +345,29 @@ function addChatUi() {
     const inputRow = document.createElement('div');
     inputRow.style.display = "flex";
 
-    chatUiContainer.appendChild(div);
     inputRow.appendChild(chatInput);
     inputRow.appendChild(sendButton);
+
+    // create clear chat button
+    const clearChat = document.createElement('button');
+    clearChat.textContent = "Clear chat";
+    clearChat.style.position = "absolute";
+    clearChat.style.top = "8px";
+    clearChat.style.left = "8px";
+    clearChat.style.border = "none";
+    clearChat.style.borderRadius = "8px";
+    clearChat.style.fontSize = "14px";
+    clearChat.style.padding = "8px";
+    clearChat.addEventListener('click', function(){
+        chatHistory = [];
+        div.innerHTML = "";
+        let key = currentProblem.id.toString();
+        chrome.storage.sync.set({ [key] : chatHistory});
+    });
+
+
+    chatUiContainer.appendChild(clearChat);
+    chatUiContainer.appendChild(div);
     chatUiContainer.appendChild(inputRow);
     btn.parentNode.insertAdjacentElement('afterend', chatUiContainer);
 
