@@ -1,0 +1,39 @@
+.popup-overlay {
+    z-index: 100;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: rgba(23, 43, 77, 0.8);
+    backdrop-filter: blur(8px);
+    overflow-y: auto;
+    position: fixed;
+  }
+
+  .popup {
+    padding: 24px;
+    border-radius: 12px;
+    width: 450px;
+    z-index: 1000;
+    margin: auto;
+    background-color: var(--color-background-primary);
+  }
+
+  .popup {
+    color: var(--color-text-readability)!important;
+  }
+
+  .popup input {
+    border: none;
+    background-color: lightgrey;
+    width: 100%;
+    padding: 8px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  .popup .btn-row {
+    display: flex;
+    justify-content: end;
+    gap: 8px;
+  }
